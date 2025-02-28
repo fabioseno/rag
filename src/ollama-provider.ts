@@ -1,5 +1,6 @@
 import axios from "axios";
 import { LogMode } from "./main";
+import { Prompt } from "./prompt";
 
 export class OllamaProvider {
     private readonly ollamaEndpoint = 'http://localhost:11434/api';
@@ -39,28 +40,12 @@ export class OllamaProvider {
         const prompt = {
             "model": this.promptModel,
             "stream": false,
-            "prompt": `
-        ### System:
-        You are an assistant that strictly follows the template provided and answer only based on information provided in the context section.</system>
-        
-        ### Context:
-        ${context}
-
-        ### Instructions:
-        ${promptInstructions}
-  
-        ### User:
-        ${question}
-
-        ### Response:
-        
-        `
+            "prompt": await Prompt.getPromptTemplate(context, question, promptInstructions)
         };
 
         if (this.logMode === LogMode.LogAll) {
             console.log('Prompt', prompt);
         }
-        console.log('Prompt', prompt);
 
         const text = await axios.post(`${this.ollamaEndpoint}/generate`, prompt)
             .then((response: any) => {
