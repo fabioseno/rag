@@ -60,7 +60,7 @@ export class Vector {
         const client = new Client({
             user: 'postgres',
             host: 'localhost',
-            database: 'deliver-that',
+            database: 'vector_db',
             password: 'password',
             port: 5433,
         });

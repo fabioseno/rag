@@ -28,36 +28,46 @@ export class OllamaProvider {
                 return response.data.embeddings[0] as number[];
             })
             .catch((error: any) => {
-                console.error('Error making the HTTP request:', error.error);
+                console.error('Error making the HTTP request:', error.response.data.error);
                 return [] as number[];
             });
 
         return embedding;
     }
 
-    async prompt(context: string, question: string): Promise<string> {
+    async prompt(context: string, question: string, promptInstructions: string = ''): Promise<string> {
         const prompt = {
             "model": this.promptModel,
             "stream": false,
             "prompt": `
-          Context:
-          ${context}
+        ### System:
+        You are an assistant that strictly follows the template provided and answer only based on information provided in the context section.</system>
+        
+        ### Context:
+        ${context}
+
+        ### Instructions:
+        ${promptInstructions}
   
-          Answer this question:
-          ${question}
+        ### User:
+        ${question}
+
+        ### Response:
+        
         `
         };
 
         if (this.logMode === LogMode.LogAll) {
             console.log('Prompt', prompt);
         }
+        console.log('Prompt', prompt);
 
         const text = await axios.post(`${this.ollamaEndpoint}/generate`, prompt)
             .then((response: any) => {
                 return response.data.response as string;
             })
             .catch((error: any) => {
-                console.error('Error making the HTTP request:', error);
+                console.error('Error making the HTTP request:', error.response.data.error);
                 return '';
             });
 

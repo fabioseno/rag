@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { v4 as uuidV4 } from 'uuid';
 import { LogMode } from "./main";
 import { OllamaProvider } from "./ollama-provider";
@@ -27,7 +28,7 @@ export class EmbeddingModel {
         console.log('Content added');
     }
 
-    async queryModel(text: string, type: string, returnContent: boolean = false): Promise<VectorInfo[]> {
+    async queryModel(text: string, type: string = 'custom', returnContent: boolean = false): Promise<VectorInfo[]> {
         const vector = new Vector();
 
         const vectorArray = await this.model.embedContent(text);
@@ -50,15 +51,28 @@ export class EmbeddingModel {
         return output;
     }
 
-    async generateAnswer(question: string, type: string): Promise<string> {
-        console.log(`[Prompting 1/3] - ${question}`);
+    async generateAnswer(question: string, type: string = 'custom', promptInstructions: string = ''): Promise<string> {
+        console.log(chalk.green(`\n[1/6] Embedding the question and performing a vector search in the database`));
+        console.log(chalk.yellow(`${question}`));
+
         const result = await this.queryModel(question, type, true);
-        console.log(`[Prompting 2/3] - Preparing the answer`);
+        let promptText = result[0]?.itemData;
+        console.log(chalk.green(`\n[2/6] Most relevant result returned from the DB`));
+        console.log(chalk.yellow(promptText));
 
-        let promptText = result.map(row => row.itemData).join('\n\n');
-        const output = await this.model.prompt(promptText, question);
+        console.log(chalk.green('\n[3/6] Processing the answer...\n'));
+        const output = await this.model.prompt(promptText!, question);
 
-        console.log('[Prompting 3/3]: ', output);
+        console.log(chalk.green('\n[4/6] Model answer:'));
+        console.log(chalk.yellow(output));
+
+        console.log(chalk.green(`\n[5/6] Now processing the answer with custom instruction in the prompt...`));
+        console.log(chalk.green(`Custom instructions: ${chalk.yellow(promptInstructions)}`));
+
+        const newOutput = await this.model.prompt(promptText!, question, promptInstructions);
+        console.log(chalk.green('\n[6/6] New answer:'));
+        console.log(chalk.yellow(newOutput));
+
         return output;
     }
 
