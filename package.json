@@ -1,0 +1,22 @@
+{
+  "name": "rag",
+  "version": "1.0.0",
+  "description": "RAG (Retrieval-Augmented Generation) in action.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx src/main.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.1",
+    "pg": "^8.13.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/pg": "^8.11.11",
+    "tsx": "^4.19.3"
+  }
+}
